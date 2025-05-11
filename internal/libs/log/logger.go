@@ -1,46 +1,19 @@
 package log
 
 import (
-	"io"
+	"fmt"
+	"github.com/StratuStore/auth/internal/libs/config"
 	"log/slog"
 	"os"
 )
 
-type Mode string
-
-const (
-	Prod Mode = "prod"
-	Dev       = "dev"
-)
-
-var presets = map[Mode]slog.Level{
-	Prod: slog.LevelInfo,
-	Dev:  slog.LevelDebug,
-}
-
-func MustNewLogger(buildMode Mode, w io.Writer) *slog.Logger {
-	if w == nil {
-		panic("error to initialize production logger")
+func New(cfg *config.Config) (*slog.Logger, error) {
+	var level slog.Level
+	if err := level.UnmarshalText([]byte(cfg.Level)); err != nil {
+		return nil, fmt.Errorf("unable to parse log level: %w", err)
 	}
 
-	return slog.New(
-		slog.NewTextHandler(w, &slog.HandlerOptions{
-			Level: presets[buildMode],
-		},
-		),
-	)
-}
+	handler := slog.NewTextHandler(os.Stdout, &slog.HandlerOptions{Level: level})
 
-func MustNewLogWriter(enableConsoleLogging bool, filepath string) (logWriter io.WriteCloser) {
-	if enableConsoleLogging {
-		logWriter = os.Stdout
-	} else {
-		var err error
-		logWriter, err = os.Create(filepath)
-		if err != nil {
-			panic("Error in opening log file")
-		}
-	}
-
-	return logWriter
+	return slog.New(handler), nil
 }
