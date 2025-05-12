@@ -5,12 +5,11 @@ import (
 )
 
 type User struct {
-	ID       uuid.UUID `json:"id" bson:"_id,omitempty"`
-	Sub      string    `json:"sub"`
-	Email    string    `json:"email"`
-	Name     string    `json:"name"`
-	Picture  string    `json:"picturePath"`
-	Sessions []Session `json:"sessions"`
+	ID      uuid.UUID `json:"id" bson:"_id,omitempty"`
+	Sub     string    `json:"sub" bson:"sub"`
+	Email   string    `json:"email" bson:"email"`
+	Name    string    `json:"name" bson:"name"`
+	Picture string    `json:"picturePath" bson:"picturePath"`
 }
 
 func (u *User) GetClaims() map[string]interface{} {

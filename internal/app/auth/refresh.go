@@ -54,13 +54,8 @@ func (s *Service) validateRefreshToken(ctx context.Context, refreshToken string)
 		return nil, nil, errors.NewNotFoundError(l, "failed to get user", "user is not found", err)
 	}
 
-	var session *core.Session
-	for _, userSession := range user.Sessions {
-		if userSession.ID == claimsSession.ID {
-			session = &userSession
-		}
-	}
-	if session == nil {
+	session, err := s.storage.GetSession(ctx, claimsSession.ID)
+	if err != nil || session.UserSub != user.Sub {
 		return nil, nil, errors.NewNotFoundError(l, "session is not found", "session is not found")
 	}
 	if session.RefreshToken != claimsSession.RefreshToken {

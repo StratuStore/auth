@@ -21,7 +21,7 @@ func (s *Storage) AddUser(ctx context.Context, user *core.User) error {
 	db := s.db
 
 	_, err := db.Collection("users").
-		InsertOne(ctx, user)
+		InsertOne(ctx, bson.D{{"sub", user.Sub}, {"email", user.Email}, {"name", user.Name}, {"picturePath", user.Picture}})
 
 	return err
 }

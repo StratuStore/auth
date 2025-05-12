@@ -20,6 +20,7 @@ type Storage interface {
 	UpdateUser(ctx context.Context, user *core.User) error
 	UpdateSession(ctx context.Context, session *core.Session) error
 	DeleteSession(ctx context.Context, sessionID uuid.UUID) error
+	GetSession(ctx context.Context, id uuid.UUID) (*core.Session, error)
 }
 
 type Context interface {
