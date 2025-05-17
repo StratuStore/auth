@@ -1,6 +1,7 @@
 package core
 
 import (
+	"errors"
 	"github.com/google/uuid"
 )
 
@@ -23,16 +24,22 @@ func (u *User) GetClaims() map[string]interface{} {
 }
 
 func NewUserFromClaims(claims map[string]interface{}) (user User, err error) {
-	defer func() {
-		if r := recover(); r != nil {
-			err = r.(error)
-		}
-	}()
-
-	sub := claims["sub"].(string)
-	email := claims["email"].(string)
-	name := claims["name"].(string)
-	picture := claims["picture"].(string)
+	sub, ok := claims["sub"].(string)
+	if !ok {
+		return User{}, errors.New("unable to parse sub")
+	}
+	email, ok := claims["email"].(string)
+	if !ok {
+		return User{}, errors.New("unable to parse email")
+	}
+	name, ok := claims["name"].(string)
+	if !ok {
+		return User{}, errors.New("unable to parse name")
+	}
+	picture, ok := claims["picture"].(string)
+	if !ok {
+		return User{}, errors.New("unable to parse picture")
+	}
 
 	return User{
 		Sub:     sub,
