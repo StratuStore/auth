@@ -2,6 +2,7 @@ package app
 
 import (
 	"github.com/StratuStore/auth/internal/app/auth"
+	"github.com/StratuStore/auth/internal/app/auth/firebase"
 	"github.com/StratuStore/auth/internal/app/auth/google"
 	"github.com/StratuStore/auth/internal/app/handler"
 	"github.com/StratuStore/auth/internal/app/storage/mongodb"
@@ -24,6 +25,7 @@ func CreateApp(cfg *config.Config) fx.Option {
 			tokens.NewRefreshJWTWorker,
 			auth.New,
 			google.New,
+			firebase.New,
 
 			handler.New,
 		),

@@ -9,6 +9,10 @@ import (
 	"github.com/ilyakaznacheev/cleanenv"
 )
 
+type Firebase struct {
+	FirebaseConfig string `env:"FIREBASE_CONFIG"`
+}
+
 type Google struct {
 	GoogleClientID          string `env:"GOOGLE_CLIENT_ID"`
 	AccessTokenExpInMinutes int    `env:"ACCESS_TOKEN_EXP_IN_MINUTES" env-default:"15"`
@@ -43,6 +47,7 @@ type Logger struct {
 }
 
 type Config struct {
+	Firebase
 	Google
 	Mongo
 	Logger

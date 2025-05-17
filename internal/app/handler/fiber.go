@@ -3,6 +3,7 @@ package handler
 import (
 	"context"
 	"github.com/StratuStore/auth/internal/app/auth"
+	"github.com/StratuStore/auth/internal/app/auth/firebase"
 	"github.com/StratuStore/auth/internal/app/auth/google"
 	"github.com/StratuStore/auth/internal/libs/config"
 	"github.com/gofiber/fiber/v2/middleware/cors"
@@ -15,14 +16,15 @@ import (
 )
 
 type Handler struct {
-	app           *fiber.App
-	l             *slog.Logger
-	cfg           *config.Config
-	googleService *google.Service
-	service       *auth.Service
+	app             *fiber.App
+	l               *slog.Logger
+	cfg             *config.Config
+	googleService   *google.Service
+	firebaseService *firebase.Service
+	service         *auth.Service
 }
 
-func New(l *slog.Logger, cfg *config.Config, googleService *google.Service, service *auth.Service) *Handler {
+func New(l *slog.Logger, cfg *config.Config, googleService *google.Service, firebaseService *firebase.Service, service *auth.Service) *Handler {
 	h := &Handler{
 		l:   l.With(slog.String("module", "internal.auth.handler")),
 		cfg: cfg,
@@ -31,8 +33,9 @@ func New(l *slog.Logger, cfg *config.Config, googleService *google.Service, serv
 			ReadTimeout:  cfg.ReadTimeout,
 			WriteTimeout: cfg.WriteTimeout,
 		}),
-		googleService: googleService,
-		service:       service,
+		googleService:   googleService,
+		firebaseService: firebaseService,
+		service:         service,
 	}
 
 	h.Register()
@@ -44,6 +47,7 @@ func (h *Handler) Register() {
 	h.registerDefaults()
 
 	h.app.Post("/google", h.Google)
+	h.app.Post("/firebase", h.Firebase)
 	h.app.Post("/refresh", h.Refresh)
 	h.app.Delete("/revoke", h.Revoke)
 }
