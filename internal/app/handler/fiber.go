@@ -5,6 +5,7 @@ import (
 	"github.com/StratuStore/auth/internal/app/auth"
 	"github.com/StratuStore/auth/internal/app/auth/google"
 	"github.com/StratuStore/auth/internal/libs/config"
+	"github.com/gofiber/fiber/v2/middleware/cors"
 	"log/slog"
 	"net"
 
@@ -48,6 +49,14 @@ func (h *Handler) Register() {
 }
 
 func (h *Handler) registerDefaults() {
+	if h.cfg.Env == "dev" {
+		h.app.Use(cors.New(cors.ConfigDefault))
+	} else {
+		h.app.Use(cors.New(cors.Config{
+			AllowOrigins: h.cfg.CORSOrigins,
+		}))
+	}
+
 	h.app.Use(recover.New(recover.Config{
 		StackTraceHandler: func(c *fiber.Ctx, r any) {
 			h.l.Error("fiber panicked", slog.Any("err", r))
