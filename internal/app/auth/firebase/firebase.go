@@ -44,6 +44,7 @@ func (s *Service) Authenticate(ctx Context, loginData LoginData) (auth.Response,
 	}
 
 	l.Debug("processing claims")
+	payload.Claims["sub"] = payload.Subject
 	claimsUser, err := core.NewUserFromClaims(payload.Claims)
 	if err != nil {
 		return auth.Response{}, errors.NewInternalError(
