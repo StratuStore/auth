@@ -8,6 +8,8 @@ import (
 	"time"
 )
 
+const Audience = "StratuStore"
+
 type JWTWorker struct {
 	*jwtauth.JWTAuth
 	secret string
@@ -19,7 +21,7 @@ func NewJWTWorker(secret string, exp time.Duration) *JWTWorker {
 		"HS512",
 		[]byte(secret),
 		nil,
-		jwt2.WithAcceptableSkew(exp),
+		jwt2.WithAudience(Audience),
 	)
 
 	return &JWTWorker{
@@ -33,6 +35,7 @@ func (j *JWTWorker) Encode(claims map[string]any) (string, error) {
 	claims["iss"] = "github.com/StratuStore/auth"
 	claims["exp"] = jwt.NewNumericDate(time.Now().Add(j.exp))
 	claims["iat"] = jwt.NewNumericDate(time.Now())
+	claims["aud"] = Audience
 
 	t := jwt.NewWithClaims(jwt.SigningMethodHS512, jwt.MapClaims(claims))
 
