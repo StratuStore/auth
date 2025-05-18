@@ -43,7 +43,10 @@ func (s *Service) validateRefreshToken(ctx context.Context, refreshToken string)
 		return nil, nil, errors.NewValidationError(l, "failed to decode refresh token", "invalid refresh token", err)
 	}
 
-	claimsSession, err := core.NewSessionFromClaims(token.PrivateClaims())
+	sessionClaims := token.PrivateClaims()
+	sessionClaims["jti"] = token.JwtID()
+	sessionClaims["sub"] = token.Subject()
+	claimsSession, err := core.NewSessionFromClaims(sessionClaims)
 	if err != nil {
 		return nil, nil, errors.NewValidationError(l, "failed to decode session", "invalid refresh token", err)
 	}
