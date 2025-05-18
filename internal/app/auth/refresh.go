@@ -23,8 +23,7 @@ func (s *Service) Refresh(ctx Context, requestBody RefreshRequest) (Response, er
 		return Response{}, err
 	}
 
-	guid := uuid.New()
-	session.RefreshToken = guid.String()
+	session.Salt = uuid.New()
 	session.DeviceData = ctx.UserAgent()
 	err = s.storage.UpdateSession(ctx, session)
 	if err != nil {
@@ -56,9 +55,9 @@ func (s *Service) validateRefreshToken(ctx context.Context, refreshToken string)
 
 	session, err := s.storage.GetSession(ctx, claimsSession.ID)
 	if err != nil || session.UserSub != user.Sub {
-		return nil, nil, errors.NewNotFoundError(l, "session is not found", "session is not found")
+		return nil, nil, errors.NewNotFoundError(l, "session is not found", "session is not found", err)
 	}
-	if session.RefreshToken != claimsSession.RefreshToken {
+	if session.Salt != claimsSession.Salt {
 		return nil, nil, errors.NewValidationError(l, "invalid refresh token", "invalid refresh token")
 	}
 

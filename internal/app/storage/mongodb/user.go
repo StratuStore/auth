@@ -4,6 +4,7 @@ import (
 	"context"
 	"github.com/StratuStore/auth/internal/app/core"
 	"go.mongodb.org/mongo-driver/bson"
+	"go.mongodb.org/mongo-driver/bson/primitive"
 )
 
 func (s *Storage) GetUser(ctx context.Context, sub string) (*core.User, error) {
@@ -20,8 +21,18 @@ func (s *Storage) GetUser(ctx context.Context, sub string) (*core.User, error) {
 func (s *Storage) AddUser(ctx context.Context, user *core.User) error {
 	db := s.db
 
-	_, err := db.Collection("users").
+	result, err := db.Collection("users").
 		InsertOne(ctx, bson.D{{"sub", user.Sub}, {"email", user.Email}, {"name", user.Name}, {"picturePath", user.Picture}})
+	if err != nil {
+		return err
+	}
+
+	id, ok := result.InsertedID.(primitive.ObjectID)
+	if !ok {
+		return nil
+	}
+
+	user.ID = id.Hex()
 
 	return err
 }

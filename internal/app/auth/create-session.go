@@ -31,11 +31,10 @@ func (s *Service) CreateSession(ctx Context, claimsUser core.User) (Response, er
 	}
 
 	l.Debug("creating session")
-	guid := uuid.New()
 	session := &core.Session{
-		UserSub:      user.Sub,
-		RefreshToken: guid.String(),
-		DeviceData:   ctx.UserAgent(),
+		UserSub:    user.Sub,
+		Salt:       uuid.New(),
+		DeviceData: ctx.UserAgent(),
 	}
 	err = s.storage.AddSession(ctx, session)
 	if err != nil {
@@ -51,13 +50,13 @@ func (s *Service) generateTokens(user *core.User, session *core.Session) (Respon
 	)
 
 	l.Debug("generating refresh token")
-	_, refreshTokenString, err := s.refreshTokenAuth.Encode(session.GetClaims())
+	refreshTokenString, err := s.refreshTokenAuth.Encode(session.GetClaims())
 	if err != nil {
 		return Response{}, errors.NewInternalError(l, "unable to encode refresh token", err)
 	}
 
 	l.Debug("generating access token")
-	_, accessTokenString, err := s.accessTokenAuth.Encode(user.GetClaims())
+	accessTokenString, err := s.accessTokenAuth.Encode(user.GetClaims())
 	if err != nil {
 		return Response{}, errors.NewInternalError(l, "unable to generate access token", err)
 	}
