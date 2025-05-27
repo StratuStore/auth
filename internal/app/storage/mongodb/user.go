@@ -3,6 +3,7 @@ package mongodb
 import (
 	"context"
 	"github.com/StratuStore/auth/internal/app/core"
+	"github.com/mbretter/go-mongodb/types"
 	"go.mongodb.org/mongo-driver/bson"
 	"go.mongodb.org/mongo-driver/bson/primitive"
 )
@@ -32,7 +33,7 @@ func (s *Storage) AddUser(ctx context.Context, user *core.User) error {
 		return nil
 	}
 
-	user.ID = id.Hex()
+	user.ID = types.ObjectId(id.Hex())
 
 	return err
 }

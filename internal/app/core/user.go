@@ -2,19 +2,20 @@ package core
 
 import (
 	"errors"
+	"github.com/mbretter/go-mongodb/types"
 )
 
 type User struct {
-	ID      string `json:"id" bson:"_id,omitempty"`
-	Sub     string `json:"sub" bson:"sub"`
-	Email   string `json:"email" bson:"email"`
-	Name    string `json:"name" bson:"name"`
-	Picture string `json:"picturePath" bson:"picturePath"`
+	ID      types.ObjectId `json:"id" bson:"_id,omitempty"`
+	Sub     string         `json:"sub" bson:"sub"`
+	Email   string         `json:"email" bson:"email"`
+	Name    string         `json:"name" bson:"name"`
+	Picture string         `json:"picturePath" bson:"picturePath"`
 }
 
 func (u *User) GetClaims() map[string]interface{} {
 	return map[string]interface{}{
-		"id":      u.ID,
+		"id":      string(u.ID),
 		"sub":     u.Sub,
 		"email":   u.Email,
 		"name":    u.Name,

@@ -3,18 +3,19 @@ package core
 import (
 	"fmt"
 	"github.com/google/uuid"
+	"github.com/mbretter/go-mongodb/types"
 )
 
 type Session struct {
-	ID         string    `json:"id" bson:"_id,omitempty"`
-	UserSub    string    `json:"sub" bson:"userSub"`
-	Salt       uuid.UUID `json:"jti" bson:"salt"`
-	DeviceData string    `json:"deviceData"`
+	ID         types.ObjectId `json:"id" bson:"_id,omitempty"`
+	UserSub    string         `json:"sub" bson:"userSub"`
+	Salt       uuid.UUID      `json:"jti" bson:"salt"`
+	DeviceData string         `json:"deviceData"`
 }
 
 func (session *Session) GetClaims() map[string]interface{} {
 	return map[string]interface{}{
-		"id":         session.ID,
+		"id":         string(session.ID),
 		"sub":        session.UserSub,
 		"deviceData": session.DeviceData,
 		"jti":        session.Salt.String(),
@@ -41,7 +42,7 @@ func NewSessionFromClaims(claims map[string]interface{}) (session Session, err e
 	}
 
 	return Session{
-		ID:         idStr,
+		ID:         types.ObjectId(idStr),
 		UserSub:    userSub,
 		DeviceData: deviceData,
 		Salt:       salt,

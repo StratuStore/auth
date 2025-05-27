@@ -4,6 +4,7 @@ import (
 	"context"
 	"github.com/StratuStore/auth/internal/app/core"
 	"github.com/StratuStore/auth/internal/app/tokens"
+	"github.com/mbretter/go-mongodb/types"
 	"log/slog"
 )
 
@@ -18,8 +19,8 @@ type Storage interface {
 	AddSession(ctx context.Context, session *core.Session) error
 	UpdateUser(ctx context.Context, user *core.User) error
 	UpdateSession(ctx context.Context, session *core.Session) error
-	DeleteSession(ctx context.Context, sessionID string) error
-	GetSession(ctx context.Context, id string) (*core.Session, error)
+	DeleteSession(ctx context.Context, sessionID types.ObjectId) error
+	GetSession(ctx context.Context, id types.ObjectId) (*core.Session, error)
 }
 
 type Context interface {

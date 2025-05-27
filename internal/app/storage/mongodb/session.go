@@ -2,8 +2,8 @@ package mongodb
 
 import (
 	"context"
-	"fmt"
 	"github.com/StratuStore/auth/internal/app/core"
+	"github.com/mbretter/go-mongodb/types"
 	"go.mongodb.org/mongo-driver/bson"
 	"go.mongodb.org/mongo-driver/bson/primitive"
 )
@@ -22,7 +22,7 @@ func (s *Storage) AddSession(ctx context.Context, session *core.Session) error {
 		return nil
 	}
 
-	session.ID = id.Hex()
+	session.ID = types.ObjectId(id.Hex())
 
 	return err
 }
@@ -30,14 +30,9 @@ func (s *Storage) AddSession(ctx context.Context, session *core.Session) error {
 func (s *Storage) UpdateSession(ctx context.Context, session *core.Session) error {
 	db := s.db
 
-	objID, err := primitive.ObjectIDFromHex(session.ID)
-	if err != nil {
-		return fmt.Errorf("unable to convert sessionID to objectID: %w", err)
-	}
-
-	filter := bson.D{{"_id", objID}}
+	filter := bson.D{{"_id", session.ID}}
 	update := bson.D{{"$set", bson.D{{"salt", session.Salt}, {"deviceData", session.DeviceData}}}}
-	_, err = db.Collection("sessions").
+	_, err := db.Collection("sessions").
 		UpdateOne(
 			ctx,
 			filter,
@@ -47,15 +42,10 @@ func (s *Storage) UpdateSession(ctx context.Context, session *core.Session) erro
 	return err
 }
 
-func (s *Storage) DeleteSession(ctx context.Context, id string) error {
+func (s *Storage) DeleteSession(ctx context.Context, id types.ObjectId) error {
 	db := s.db
 
-	objID, err := primitive.ObjectIDFromHex(id)
-	if err != nil {
-		return fmt.Errorf("unable to convert sessionID to objectID: %w", err)
-	}
-
-	filter := bson.D{{"_id", objID}}
+	filter := bson.D{{"_id", id}}
 	result := db.Collection("sessions").
 		FindOneAndDelete(
 			ctx,
@@ -65,17 +55,12 @@ func (s *Storage) DeleteSession(ctx context.Context, id string) error {
 	return result.Err()
 }
 
-func (s *Storage) GetSession(ctx context.Context, id string) (*core.Session, error) {
+func (s *Storage) GetSession(ctx context.Context, id types.ObjectId) (*core.Session, error) {
 	db := s.db
 
-	objID, err := primitive.ObjectIDFromHex(id)
-	if err != nil {
-		return nil, fmt.Errorf("unable to convert sessionID to objectID: %w", err)
-	}
-
 	var session core.Session
-	err = db.Collection("sessions").
-		FindOne(ctx, bson.M{"_id": objID}).
+	err := db.Collection("sessions").
+		FindOne(ctx, bson.M{"_id": id}).
 		Decode(&session)
 
 	return &session, err
