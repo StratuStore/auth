@@ -7,7 +7,6 @@ import (
 
 type User struct {
 	ID      types.ObjectId `json:"id" bson:"_id,omitempty"`
-	Sub     string         `json:"sub" bson:"sub"`
 	Email   string         `json:"email" bson:"email"`
 	Name    string         `json:"name" bson:"name"`
 	Picture string         `json:"picturePath" bson:"picturePath"`
@@ -16,7 +15,6 @@ type User struct {
 func (u *User) GetClaims() map[string]interface{} {
 	return map[string]interface{}{
 		"id":      string(u.ID),
-		"sub":     u.Sub,
 		"email":   u.Email,
 		"name":    u.Name,
 		"picture": u.Picture,
@@ -24,10 +22,6 @@ func (u *User) GetClaims() map[string]interface{} {
 }
 
 func NewUserFromClaims(claims map[string]interface{}) (user User, err error) {
-	sub, ok := claims["sub"].(string)
-	if !ok {
-		return User{}, errors.New("unable to parse sub")
-	}
 	email, ok := claims["email"].(string)
 	if !ok {
 		return User{}, errors.New("unable to parse email")
@@ -42,7 +36,6 @@ func NewUserFromClaims(claims map[string]interface{}) (user User, err error) {
 	}
 
 	return User{
-		Sub:     sub,
 		Email:   email,
 		Name:    name,
 		Picture: picture,

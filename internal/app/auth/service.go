@@ -14,7 +14,8 @@ type Response struct {
 }
 
 type Storage interface {
-	GetUser(ctx context.Context, sub string) (*core.User, error)
+	GetUserByEmail(ctx context.Context, email string) (*core.User, error)
+	GetUserByID(ctx context.Context, id string) (*core.User, error)
 	AddUser(ctx context.Context, user *core.User) error
 	AddSession(ctx context.Context, session *core.Session) error
 	UpdateUser(ctx context.Context, user *core.User) error

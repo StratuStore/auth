@@ -51,13 +51,13 @@ func (s *Service) validateRefreshToken(ctx context.Context, refreshToken string)
 		return nil, nil, errors.NewValidationError(l, "failed to decode session", "invalid refresh token", err)
 	}
 
-	user, err := s.storage.GetUser(ctx, claimsSession.UserSub)
+	user, err := s.storage.GetUserByID(ctx, claimsSession.UserSub)
 	if err != nil {
 		return nil, nil, errors.NewNotFoundError(l, "failed to get user", "user is not found", err)
 	}
 
 	session, err := s.storage.GetSession(ctx, claimsSession.ID)
-	if err != nil || session.UserSub != user.Sub {
+	if err != nil || session.UserSub != string(user.ID) {
 		return nil, nil, errors.NewNotFoundError(l, "session is not found", "session is not found", err)
 	}
 	if session.Salt != claimsSession.Salt {

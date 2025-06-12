@@ -13,7 +13,7 @@ func (s *Service) CreateSession(ctx Context, claimsUser core.User) (Response, er
 	)
 
 	l.Debug("checking if user already exists")
-	user, err := s.storage.GetUser(ctx, claimsUser.Sub)
+	user, err := s.storage.GetUserByEmail(ctx, claimsUser.Email)
 	if err != nil {
 		if err = s.storage.AddUser(ctx, &claimsUser); err != nil {
 			return Response{}, errors.NewInternalError(l, "unable to add user to db", err)
@@ -32,7 +32,7 @@ func (s *Service) CreateSession(ctx Context, claimsUser core.User) (Response, er
 
 	l.Debug("creating session")
 	session := &core.Session{
-		UserSub:    user.Sub,
+		UserSub:    string(user.ID),
 		Salt:       uuid.New(),
 		DeviceData: ctx.UserAgent(),
 	}
